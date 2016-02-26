@@ -160,18 +160,21 @@ robschripsema:
     - rick.kaiser
 
 rj_rockets:
+  acquaintence:
     - alissafrench
+    - ianbharper
+  friend:
     - amiel
-    - andleer
     - bmck
     - bryanrsmith
-    - ianbharper
     - josh
     - nathancarnes
+    - teskadera
+    - tim
+    - victor
+  worked with:
+    - andleer
     - perry.fizzano
     - rhj4
     - robschripsema
     - sydneypaige
-    - teskadera
-    - tim
-    - victor

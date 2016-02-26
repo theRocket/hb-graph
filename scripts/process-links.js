@@ -3,6 +3,17 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const _ = require('lodash');
+
+const linkKinds = ['acquaintence', 'friend', 'worked with'];
+const defaultLinkKind = linkKinds[0];
+
+function createLinkBetween(x, y, kind) {
+	kind = kind || defaultLinkKind;
+	return x < y ?
+		{ source: x, target: y, kind } :
+		{ source: y, target: x, kind };
+}
 
 fs.readFile(path.join(__dirname, '../data/users.json'), (err, data) => {
 	if (err) throw err;
@@ -15,20 +26,25 @@ fs.readFile(path.join(__dirname, '../data/users.json'), (err, data) => {
 
 		const links = yaml.safeLoad(data);
 
-		const distinctLinks = Object.keys(links).reduce(
-			(acc, source) => Object.assign({},
-				acc,
-				{ [source]: links[source].filter(target => !acc[target] || acc[target].indexOf(source) === -1) }),
-			{});
+		const userLinks = _(Object.keys(links))
+			// create a flat list of source->target + kind links
+			.map(source =>
+				Array.isArray(links[source]) ?
+					// if it's just an array, there are no categories set up; produce link objects defaulted to "acquaintance"
+					links[source].map(target => createLinkBetween(source, target)) :
+					// otherwise, walk all of the link kind properties and produce link objects of the appropriate kind
+					_.flatten(linkKinds.map(kind =>
+						(links[source][kind] || []).map(target => createLinkBetween(source, target, kind)))))
+			.flatten()
+			// order the links by highest precedence, then order by source names
+			.orderBy([x => linkKinds.indexOf(x.kind), 'source'], ['desc', 'asc'])
+			// filter out duplicate links
+			.uniqWith((x, y) => x.source === y.source && x.target === y.target)
+			// transform to numeric references
+			.map((x) => ({ source: userIds[x.source], target: userIds[x.target], kind: x.kind }))
+			.value();
 
-		const linkOutput = Object.keys(distinctLinks)
-			.map(source => distinctLinks[source].map(target => ({
-				source: userIds[source],
-				target: userIds[target],
-			})))
-			.reduce((acc, curr) => [...acc, ...curr], []);
-
-		const output = Object.assign({}, users, { links: linkOutput });
+		const output = Object.assign({}, users, { links: userLinks });
 		fs.writeFile(path.join(__dirname,'../public/merged.json'), JSON.stringify(output, null, 2), err => {
 			if (err) throw err;
 			console.log('Done!');
