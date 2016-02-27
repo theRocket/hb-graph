@@ -5,7 +5,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 const _ = require('lodash');
 
-const linkKinds = ['acquaintence', 'friend', 'worked with'];
+const linkKinds = ['aquaintance', 'friend', 'worked with', 'co-worker'];
 const defaultLinkKind = linkKinds[0];
 
 function createLinkBetween(x, y, kind) {
@@ -41,7 +41,7 @@ fs.readFile(path.join(__dirname, '../data/users.json'), (err, data) => {
 			// filter out duplicate links
 			.uniqWith((x, y) => x.source === y.source && x.target === y.target)
 			// transform to numeric references
-			.map((x) => ({ source: userIds[x.source], target: userIds[x.target], kind: x.kind }))
+			.map((x) => ({ source: userIds[x.source], target: userIds[x.target], relation: x.kind }))
 			.value();
 
 		const output = Object.assign({}, users, { links: userLinks });

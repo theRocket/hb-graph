@@ -160,7 +160,7 @@ robschripsema:
     - rick.kaiser
 
 rj_rockets:
-  acquaintence:
+  aquaintance:
     - alissafrench
     - ianbharper
   friend:

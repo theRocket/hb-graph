@@ -15,8 +15,11 @@
 }
 
 .link.highlighted {
-	stroke: darkred;
-	stroke-width: 2px;
+	stroke-width: 3px;
+}
+
+.link.aquaintence {
+	stroke: ;
 }
 
 </style>
@@ -25,9 +28,9 @@
 <script>
 
 var width = 800,
-	height = 600;
-
-var color = d3.scale.category20();
+	height = 800;
+				 
+var color = d3.scale.category10();
 
 var force = d3.layout.force()
 	.charge(-120)
@@ -54,7 +57,8 @@ function render(graph) {
 
 	var link = svg.selectAll(".link").data(graph.links)
 		.enter().append("line")
-			.attr("class", "link");
+			.attr("class", "link")
+			.style("stroke", function(d) { return color(d.relation+1); });
 
 	var node = svg.selectAll(".node").data(graph.nodes)
 		.enter().append("image")
@@ -83,5 +87,6 @@ function render(graph) {
 			.attr("y", function(d) { return d.y; });
 	});
 };
+
 
 </script>
